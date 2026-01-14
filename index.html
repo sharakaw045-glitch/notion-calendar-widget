@@ -10,21 +10,20 @@
       --fg: #ffffff;
       --muted: rgba(255,255,255,.75);
 
-      /* 今日の強調（白い丸） */
       --todayBg: #ffffff;
       --todayFg: #2f79a6;
 
-      /* サイズ */
-      --fontScale: 1;  /* そのまま2倍 */
-      --radius: 18px;
-      --gap: 10px;
+      --fontScale: 1.6;
+      --radius: 16px;
+      --gap: 8px;
     }
+
     *{ box-sizing: border-box; }
     html, body{
       margin: 0;
       padding: 0;
       background: transparent;
-      overflow: hidden; /* ページ全体の余計なスクロールは抑える */
+      overflow: hidden;
     }
     body{
       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
@@ -34,34 +33,23 @@
       background: var(--bg);
       color: var(--fg);
       border-radius: var(--radius);
-      padding: calc(16px * var(--fontScale));
+      padding: calc(12px * var(--fontScale));
       width: 100%;
-      /* 高さ固定＆overflow hidden をやめる（切れるのを防ぐ） */
     }
 
     .top{
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: calc(14px * var(--fontScale));
+      justify-content: flex-start; /* ボタン削除なので左寄せ */
+      margin-bottom: calc(10px * var(--fontScale));
     }
     .month{
       font-weight: 700;
       letter-spacing: .02em;
       font-size: calc(14px * var(--fontScale));
       line-height: 1.1;
-    }
-    .open{
-      font-size: calc(12px * var(--fontScale));
-      color: var(--fg);
-      text-decoration: none;
-      background: rgba(255,255,255,.18);
-      padding: calc(8px * var(--fontScale)) calc(10px * var(--fontScale));
-      border-radius: 999px;
       white-space: nowrap;
     }
-    .open:hover{ background: rgba(255,255,255,.26); }
 
     .dow{
       display: grid;
@@ -80,7 +68,6 @@
       gap: var(--gap);
     }
 
-    /* フラット表示 */
     .cell{
       display: grid;
       place-items: center;
@@ -113,12 +100,8 @@
   <div class="card">
     <div class="top">
       <div class="month" id="monthLabel"></div>
-      <a class="open" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">
-        Googleカレンダーを開く
-      </a>
     </div>
 
-    <!-- 日曜始まり -->
     <div class="dow">
       <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
     </div>
@@ -132,7 +115,7 @@
 
     const now = new Date();
     const y = now.getFullYear();
-    const m = now.getMonth(); // 0-11
+    const m = now.getMonth();
 
     const todayY = now.getFullYear();
     const todayM = now.getMonth();
@@ -141,10 +124,9 @@
     const first = new Date(y, m, 1);
     const last = new Date(y, m + 1, 0);
 
-    monthLabel.textContent = `${y} ${m + 1}月`;
+    monthLabel.textContent = `${y}年 ${m + 1}月`;
 
-    // 日曜始まり
-    const leadingEmpty = first.getDay();
+    const leadingEmpty = first.getDay(); // 日曜始まり
     const daysInMonth = last.getDate();
     const totalCells = leadingEmpty + daysInMonth;
     const trailingEmpty = (7 - (totalCells % 7)) % 7;
@@ -164,6 +146,7 @@
         a.classList.add('today');
       }
 
+      // 日付クリックでGoogleカレンダーを開く
       a.href = "https://calendar.google.com/calendar/u/0/r";
       a.target = "_blank";
       a.rel = "noopener";
