@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calendar Widget</title>
+  <style>
+    :root{
+      --bg: #2f79a6;
+      --fg: #ffffff;
+      --muted: rgba(255,255,255,.75);
+
+      /* 今日の強調（白い丸） */
+      --todayBg: #ffffff;
+      --todayFg: #2f79a6;
+
+      --fontScale: 2;        /* 文字サイズ倍率 */
+      --radius: 18px;
+      --gap: 10px;
+    }
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      background: transparent;
+    }
+    .card{
+      background: var(--bg);
+      color: var(--fg);
+      border-radius: var(--radius);
+      padding: calc(16px * var(--fontScale));
+      width: 100%;
+    }
+    .top{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: calc(14px * var(--fontScale));
+    }
+    .month{
+      font-weight: 700;
+      letter-spacing: .02em;
+      font-size: calc(14px * var(--fontScale));
+    }
+    .open{
+      font-size: calc(12px * var(--fontScale));
+      color: var(--fg);
+      text-decoration: none;
+      background: rgba(255,255,255,.18);
+      padding: calc(8px * var(--fontScale)) calc(10px * var(--fontScale));
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .open:hover{ background: rgba(255,255,255,.26); }
+
+    .dow{
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: var(--gap);
+      margin-bottom: var(--gap);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: calc(11px * var(--fontScale));
+      text-align: center;
+    }
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: var(--gap);
+    }
+
+    /* フラット表示：各日付に背景を持たせない */
+    .cell{
+      display: grid;
+      place-items: center;
+      aspect-ratio: 1 / 1;
+      border-radius: 999px;
+      background: transparent;
+      text-decoration: none;
+      color: var(--fg);
+      font-weight: 700;
+      font-size: calc(12px * var(--fontScale));
+      user-select: none;
+    }
+
+    /* hoverは薄く（完全に消したければこのブロックごと削除） */
+    .cell:hover{
+      background: rgba(255,255,255,.12);
+    }
+
+    .empty{
+      background: transparent;
+      pointer-events: none;
+    }
+
+    /* 今日だけは明確に */
+    .cell.today{
+      background: var(--todayBg);
+      color: var(--todayFg);
+    }
+    .cell.today:hover{
+      background: var(--todayBg);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="top">
+      <div class="month" id="monthLabel"></div>
+      <a class="open" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">
+        Googleカレンダーを開く
+      </a>
+    </div>
+
+    <!-- 日曜始まり -->
+    <div class="dow">
+      <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <script>
+    const monthLabel = document.getElementById('monthLabel');
+    const grid = document.getElementById('grid');
+
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth(); // 0-11
+    const todayY = now.getFullYear();
+    const todayM = now.getMonth();
+    const todayD = now.getDate();
+
+    const first = new Date(y, m, 1);
+    const last = new Date(y, m + 1, 0);
+
+    monthLabel.textContent = `${y}年 ${m + 1}月`;
+
+    // 日曜始まり：getDay()（日=0, 月=1...）をそのまま使う
+    const leadingEmpty = first.getDay();
+    const daysInMonth = last.getDate();
+    const totalCells = leadingEmpty + daysInMonth;
+    const trailingEmpty = (7 - (totalCells % 7)) % 7;
+
+    // 月初の空白
+    for(let i = 0; i < leadingEmpty; i++){
+      const div = document.createElement('div');
+      div.className = 'cell empty';
+      grid.appendChild(div);
+    }
+
+    // 日付セル
+    for(let d = 1; d <= daysInMonth; d++){
+      const a = document.createElement('a');
+      a.className = 'cell';
+      a.textContent = d;
+
+      // 今日を強調（表示中の月が今日の月の時だけ）
+      if (y === todayY && m === todayM && d === todayD) {
+        a.classList.add('today');
+      }
+
+      // クリックでGoogleカレンダーWebを開く
+      a.href = "https://calendar.google.com/calendar/u/0/r";
+      a.target = "_blank";
+      a.rel = "noopener";
+
+      grid.appendChild(a);
+    }
+
+    // 月末の空白
+    for(let i = 0; i < trailingEmpty; i++){
+      const div = document.createElement('div');
+      div.className = 'cell empty';
+      grid.appendChild(div);
+    }
+  </script>
+</body>
+</html>
