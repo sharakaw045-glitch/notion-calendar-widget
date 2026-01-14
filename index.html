@@ -14,23 +14,31 @@
       --todayBg: #ffffff;
       --todayFg: #2f79a6;
 
-      --fontScale: 2;        /* 文字サイズ倍率 */
+      /* サイズ */
+      --fontScale: 2;  /* そのまま2倍 */
       --radius: 18px;
       --gap: 10px;
     }
     *{ box-sizing: border-box; }
-    body{
+    html, body{
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      padding: 0;
       background: transparent;
+      overflow: hidden; /* ページ全体の余計なスクロールは抑える */
     }
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    }
+
     .card{
       background: var(--bg);
       color: var(--fg);
       border-radius: var(--radius);
       padding: calc(16px * var(--fontScale));
       width: 100%;
+      /* 高さ固定＆overflow hidden をやめる（切れるのを防ぐ） */
     }
+
     .top{
       display: flex;
       align-items: center;
@@ -42,6 +50,7 @@
       font-weight: 700;
       letter-spacing: .02em;
       font-size: calc(14px * var(--fontScale));
+      line-height: 1.1;
     }
     .open{
       font-size: calc(12px * var(--fontScale));
@@ -64,13 +73,14 @@
       font-size: calc(11px * var(--fontScale));
       text-align: center;
     }
+
     .grid{
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: var(--gap);
     }
 
-    /* フラット表示：各日付に背景を持たせない */
+    /* フラット表示 */
     .cell{
       display: grid;
       place-items: center;
@@ -82,26 +92,20 @@
       font-weight: 700;
       font-size: calc(12px * var(--fontScale));
       user-select: none;
+      line-height: 1;
     }
-
-    /* hoverは薄く（完全に消したければこのブロックごと削除） */
-    .cell:hover{
-      background: rgba(255,255,255,.12);
-    }
+    .cell:hover{ background: rgba(255,255,255,.12); }
 
     .empty{
       background: transparent;
       pointer-events: none;
     }
 
-    /* 今日だけは明確に */
     .cell.today{
       background: var(--todayBg);
       color: var(--todayFg);
     }
-    .cell.today:hover{
-      background: var(--todayBg);
-    }
+    .cell.today:hover{ background: var(--todayBg); }
   </style>
 </head>
 
@@ -129,6 +133,7 @@
     const now = new Date();
     const y = now.getFullYear();
     const m = now.getMonth(); // 0-11
+
     const todayY = now.getFullYear();
     const todayM = now.getMonth();
     const todayD = now.getDate();
@@ -138,31 +143,27 @@
 
     monthLabel.textContent = `${y}年 ${m + 1}月`;
 
-    // 日曜始まり：getDay()（日=0, 月=1...）をそのまま使う
+    // 日曜始まり
     const leadingEmpty = first.getDay();
     const daysInMonth = last.getDate();
     const totalCells = leadingEmpty + daysInMonth;
     const trailingEmpty = (7 - (totalCells % 7)) % 7;
 
-    // 月初の空白
-    for(let i = 0; i < leadingEmpty; i++){
+    for (let i = 0; i < leadingEmpty; i++) {
       const div = document.createElement('div');
       div.className = 'cell empty';
       grid.appendChild(div);
     }
 
-    // 日付セル
-    for(let d = 1; d <= daysInMonth; d++){
+    for (let d = 1; d <= daysInMonth; d++) {
       const a = document.createElement('a');
       a.className = 'cell';
       a.textContent = d;
 
-      // 今日を強調（表示中の月が今日の月の時だけ）
       if (y === todayY && m === todayM && d === todayD) {
         a.classList.add('today');
       }
 
-      // クリックでGoogleカレンダーWebを開く
       a.href = "https://calendar.google.com/calendar/u/0/r";
       a.target = "_blank";
       a.rel = "noopener";
@@ -170,8 +171,7 @@
       grid.appendChild(a);
     }
 
-    // 月末の空白
-    for(let i = 0; i < trailingEmpty; i++){
+    for (let i = 0; i < trailingEmpty; i++) {
       const div = document.createElement('div');
       div.className = 'cell empty';
       grid.appendChild(div);
