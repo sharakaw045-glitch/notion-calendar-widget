@@ -15,7 +15,7 @@
       --todayFg: #2f79a6;
 
       /* サイズ */
-      --fontScale: 2;  /* そのまま2倍 */
+      --fontScale: 1;  /* そのまま2倍 */
       --radius: 18px;
       --gap: 10px;
     }
@@ -141,7 +141,7 @@
     const first = new Date(y, m, 1);
     const last = new Date(y, m + 1, 0);
 
-    monthLabel.textContent = `${y}年 ${m + 1}月`;
+    monthLabel.textContent = `${y} ${m + 1}月`;
 
     // 日曜始まり
     const leadingEmpty = first.getDay();
